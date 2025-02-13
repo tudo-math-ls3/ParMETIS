@@ -1,43 +1,148 @@
-cmake_minimum_required(VERSION 2.8)
-project(ParMETIS C)
+cmake_minimum_required(VERSION 3.18)
 
+project(ParMETIS 
+  VERSION 4.0.3
+  DESCRIPTION "Parallel mesh partitioning library"
+  LANGUAGES C)
 
-# Search for MPI.
-# GK commented this out as it seems to be creating problems
-# include(FindMPI)
-# if(NOT MPI_FOUND)
-#   message(FATAL_ERROR "mpi is not found")
-# endif()
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MPI_COMPILE_FLAGS}")
+##############
+# Build GKlib
+##############
 
+set(GKLIB_SOURCES
+  GKlib/b64.c
+  GKlib/blas.c
+  GKlib/cache.c
+  GKlib/csr.c
+  GKlib/error.c
+  GKlib/evaluate.c
+  GKlib/fkvkselect.c
+  GKlib/fs.c
+  GKlib/getopt.c
+  GKlib/gkregex.c
+  GKlib/graph.c
+  GKlib/htable.c
+  GKlib/io.c
+  GKlib/itemsets.c
+  GKlib/mcore.c
+  GKlib/memory.c
+  GKlib/pqueue.c
+  GKlib/random.c
+  GKlib/rw.c
+  GKlib/seq.c
+  GKlib/sort.c
+  GKlib/string.c
+  GKlib/timers.c
+  GKlib/tokenizer.c
+)
+add_library(gklib STATIC ${GKLIB_SOURCES})
+target_include_directories(gklib PUBLIC GKlib/)
 
-# Prepare libraries.
-if(SHARED)
-  set(ParMETIS_LIBRARY_TYPE SHARED)
-else()
-  set(ParMETIS_LIBRARY_TYPE STATIC)
-endif()
+##############
+# Build METIS
+##############
 
-include(./conf/gkbuild.cmake)
+set(METIS_SOURCES
+  METIS/libmetis/auxapi.c
+  METIS/libmetis/balance.c
+  METIS/libmetis/bucketsort.c
+  METIS/libmetis/checkgraph.c
+  METIS/libmetis/coarsen.c
+  METIS/libmetis/compress.c
+  METIS/libmetis/contig.c
+  METIS/libmetis/debug.c
+  METIS/libmetis/fm.c
+  METIS/libmetis/fortran.c
+  METIS/libmetis/frename.c
+  METIS/libmetis/gklib.c
+  METIS/libmetis/graph.c
+  METIS/libmetis/initpart.c
+  METIS/libmetis/kmetis.c
+  METIS/libmetis/kwayfm.c
+  METIS/libmetis/kwayrefine.c
+  METIS/libmetis/mcutil.c
+  METIS/libmetis/mesh.c
+  METIS/libmetis/meshpart.c
+  METIS/libmetis/minconn.c
+  METIS/libmetis/mmd.c
+  METIS/libmetis/ometis.c
+  METIS/libmetis/options.c
+  METIS/libmetis/parmetis.c
+  METIS/libmetis/pmetis.c
+  METIS/libmetis/refine.c
+  METIS/libmetis/separator.c
+  METIS/libmetis/sfm.c
+  METIS/libmetis/srefine.c
+  METIS/libmetis/stat.c
+  METIS/libmetis/timing.c
+  METIS/libmetis/util.c
+  METIS/libmetis/wspace.c
+)
 
-# List of paths that the compiler will search for header files.
-# i.e., the -I equivalent
-include_directories(include)
-include_directories(${MPI_INCLUDE_PATH})
-include_directories(${GKLIB_PATH}/include)
-include_directories(${METIS_PATH}/include)
-include_directories(${CMAKE_INSTALL_PREFIX}/include)
+add_library(metis STATIC ${METIS_SOURCES})
+target_include_directories(metis PRIVATE METIS/libmetis)
+target_include_directories(metis PUBLIC METIS/include)
+# Compile metis with 64 bit indices and floating point values
+target_compile_definitions(metis PRIVATE IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
+target_link_libraries(metis PRIVATE gklib)
 
-# List of paths that the compiler will search for library files.
-# i.e., the -L equivalent
-link_directories(${GKLIB_PATH}/lib)
-link_directories(${METIS_PATH}/lib)
-link_directories(${CMAKE_INSTALL_PREFIX}/lib)
+#################
+# Build parmetis
+#################
 
-# List of directories that cmake will look for CMakeLists.txt
-add_subdirectory(include)
-add_subdirectory(libparmetis)
-add_subdirectory(programs)
+set(PARMETIS_SOURCES
+  libparmetis/akwayfm.c
+  libparmetis/ametis.c
+  libparmetis/balancemylink.c
+  libparmetis/comm.c
+  libparmetis/csrmatch.c
+  libparmetis/ctrl.c
+  libparmetis/debug.c
+  libparmetis/diffutil.c
+  libparmetis/frename.c
+  libparmetis/gklib.c
+  libparmetis/gkmetis.c
+  libparmetis/gkmpi.c
+  libparmetis/graph.c
+  libparmetis/initbalance.c
+  libparmetis/initmsection.c
+  libparmetis/initpart.c
+  libparmetis/kmetis.c
+  libparmetis/kwayrefine.c
+  libparmetis/match.c
+  libparmetis/mdiffusion.c
+  libparmetis/mesh.c
+  libparmetis/mmetis.c
+  libparmetis/move.c
+  libparmetis/msetup.c
+  libparmetis/node_refine.c
+  libparmetis/ometis.c
+  libparmetis/pspases.c
+  libparmetis/redomylink.c
+  libparmetis/remap.c
+  libparmetis/renumber.c
+  libparmetis/rmetis.c
+  libparmetis/selectq.c
+  libparmetis/serial.c
+  libparmetis/stat.c
+  libparmetis/timer.c
+  libparmetis/util.c
+  libparmetis/wave.c
+  libparmetis/weird.c
+  libparmetis/wspace.c
+  libparmetis/xyzpart.c
+)
 
-# This is for testing during development and is not being distributed
-#add_subdirectory(test)
+add_library(parmetis STATIC ${PARMETIS_SOURCES})
+target_include_directories(parmetis PRIVATE libparmetis)
+target_include_directories(parmetis PUBLIC include)
+# Compile parmetis with 64 bit indices and floating point values
+target_compile_definitions(parmetis PRIVATE IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
+target_link_libraries(parmetis PRIVATE gklib metis)
+
+find_package(MPI REQUIRED)
+target_link_libraries(parmetis PRIVATE MPI::MPI_C)
+
+# Setup alias for usage with FetchContent
+add_library(ParMetis::ParMetis ALIAS parmetis)
+
