@@ -144,5 +144,5 @@ find_package(MPI REQUIRED)
 target_link_libraries(parmetis PRIVATE MPI::MPI_C)
 
 # Setup alias for usage with FetchContent
-add_library(ParMetis::ParMetis ALIAS parmetis)
+add_library(ParMETIS::ParMETIS ALIAS parmetis)
 
