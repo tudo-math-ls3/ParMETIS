@@ -138,7 +138,7 @@ target_include_directories(parmetis PRIVATE libparmetis)
 target_include_directories(parmetis PUBLIC include)
 # Compile parmetis with 64 bit indices and floating point values
 target_compile_definitions(parmetis PRIVATE IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(parmetis PRIVATE gklib metis)
+target_link_libraries(parmetis PRIVATE gklib PUBLIC metis)
 
 find_package(MPI REQUIRED)
 target_link_libraries(parmetis PRIVATE MPI::MPI_C)
