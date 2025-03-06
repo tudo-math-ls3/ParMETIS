@@ -83,8 +83,8 @@ add_library(metis STATIC ${METIS_SOURCES})
 target_include_directories(metis PRIVATE METIS/libmetis)
 target_include_directories(metis PUBLIC METIS/include)
 # Compile metis with 64 bit indices and floating point values
-target_compile_definitions(metis PRIVATE IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(metis PRIVATE gklib)
+target_compile_definitions(metis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
+target_link_libraries(metis PUBLIC gklib)
 
 #################
 # Build parmetis
@@ -137,8 +137,8 @@ add_library(parmetis STATIC ${PARMETIS_SOURCES})
 target_include_directories(parmetis PRIVATE libparmetis)
 target_include_directories(parmetis PUBLIC include)
 # Compile parmetis with 64 bit indices and floating point values
-target_compile_definitions(parmetis PRIVATE IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(parmetis PRIVATE gklib PUBLIC metis)
+target_compile_definitions(parmetis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
+target_link_libraries(parmetis PUBLIC gklib metis)
 
 find_package(MPI REQUIRED)
 target_link_libraries(parmetis PRIVATE MPI::MPI_C)
