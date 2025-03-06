@@ -20,6 +20,7 @@ set(GKLIB_SOURCES
   GKlib/fs.c
   GKlib/getopt.c
   GKlib/gkregex.c
+  GKlib/gk_util.c
   GKlib/graph.c
   GKlib/htable.c
   GKlib/io.c
@@ -64,6 +65,7 @@ set(METIS_SOURCES
   METIS/libmetis/mesh.c
   METIS/libmetis/meshpart.c
   METIS/libmetis/minconn.c
+  METIS/libmetis/mincover.c
   METIS/libmetis/mmd.c
   METIS/libmetis/ometis.c
   METIS/libmetis/options.c
