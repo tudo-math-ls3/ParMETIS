@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.28)
 
 project(ParMETIS 
   VERSION 4.0.3
@@ -39,7 +39,8 @@ set(GKLIB_SOURCES
 add_library(gklib STATIC)
 target_sources(gklib PRIVATE ${GKLIB_SOURCES})
 target_sources(gklib PUBLIC
-  FILE_SET HEADERS
+  FILE_SET gklib_headers
+  TYPE HEADERS
   BASE_DIRS GKlib
   FILES
     GKlib/gk_arch.h
@@ -181,9 +182,9 @@ set(PARMETIS_SOURCES
   libparmetis/xyzpart.c
 )
 
-add_library(parmetis STATIC)
-target_sources(parmetis PRIVATE ${PARMETIS_SOURCES})
-target_sources(parmetis PRIVATE
+add_library(ParMETIS STATIC)
+target_sources(ParMETIS PRIVATE ${PARMETIS_SOURCES})
+target_sources(ParMETIS PRIVATE
   FILE_SET parmetis_private_headers
   TYPE HEADERS
   BASE_DIRS libparmetis
@@ -197,7 +198,7 @@ target_sources(parmetis PRIVATE
     libparmetis/rename.h
     libparmetis/struct.h
 )
-target_sources(parmetis PUBLIC
+target_sources(ParMETIS PUBLIC
   FILE_SET parmetis_public_headers
   TYPE HEADERS
   BASE_DIRS include
@@ -205,12 +206,49 @@ target_sources(parmetis PUBLIC
     include/parmetis.h
 )
 # Compile parmetis with 64 bit indices and floating point values
-target_compile_definitions(parmetis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(parmetis PUBLIC gklib metis)
+target_compile_definitions(ParMETIS PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
+target_link_libraries(ParMETIS PUBLIC gklib metis)
 
 find_package(MPI REQUIRED)
-target_link_libraries(parmetis PRIVATE MPI::MPI_C)
+target_link_libraries(ParMETIS PRIVATE MPI::MPI_C)
 
 # Setup alias for usage with FetchContent
-add_library(ParMETIS::ParMETIS ALIAS parmetis)
+add_library(ParMETIS::ParMETIS ALIAS ParMETIS)
+
+############
+# Packaging
+############
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# Create package version file
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/parmetis-config-version.cmake
+  COMPATIBILITY AnyNewerVersion
+)
+
+# Install package version file and package config file
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/parmetis-config-version.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/parmetis-config.cmake
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/parmetis
+)
+
+# Add target to export
+install(
+  TARGETS ParMETIS metis gklib
+  EXPORT parmetisTargets
+  FILE_SET parmetis_public_headers
+  FILE_SET metis_public_headers
+  FILE_SET gklib_headers
+)
+
+# Generate parmetisTargets.cmake
+install(
+  EXPORT parmetisTargets
+  NAMESPACE ParMETIS::
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/parmetis
+)
+
 
