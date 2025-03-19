@@ -231,7 +231,7 @@ write_basic_package_version_file(
 # Install package version file and package config file
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/parmetis-config-version.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/parmetis-config.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/parmetis-config.cmake
   DESTINATION ${CMAKE_INSTALL_DATADIR}/parmetis
 )
 
