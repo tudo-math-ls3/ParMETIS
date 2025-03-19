@@ -36,8 +36,33 @@ set(GKLIB_SOURCES
   GKlib/timers.c
   GKlib/tokenizer.c
 )
-add_library(gklib STATIC ${GKLIB_SOURCES})
-target_include_directories(gklib PUBLIC GKlib/)
+add_library(gklib STATIC)
+target_sources(gklib PRIVATE ${GKLIB_SOURCES})
+target_sources(gklib PUBLIC
+  FILE_SET HEADERS
+  BASE_DIRS GKlib
+  FILES
+    GKlib/gk_arch.h
+    GKlib/gk_defs.h
+    GKlib/gk_externs.h
+    GKlib/gk_getopt.h
+    GKlib/GKlib.h
+    GKlib/gk_macros.h
+    GKlib/gk_mkblas.h
+    GKlib/gk_mkmemory.h
+    GKlib/gk_mkpqueue2.h
+    GKlib/gk_mkpqueue.h
+    GKlib/gk_mkrandom.h
+    GKlib/gk_mksort.h
+    GKlib/gk_mkutils.h
+    GKlib/gk_ms_inttypes.h
+    GKlib/gk_ms_stat.h
+    GKlib/gk_ms_stdint.h
+    GKlib/gk_proto.h
+    GKlib/gkregex.h
+    GKlib/gk_struct.h
+    GKlib/gk_types.h
+)
 
 ##############
 # Build METIS
@@ -81,9 +106,30 @@ set(METIS_SOURCES
   METIS/libmetis/wspace.c
 )
 
-add_library(metis STATIC ${METIS_SOURCES})
-target_include_directories(metis PRIVATE METIS/libmetis)
-target_include_directories(metis PUBLIC METIS/include)
+add_library(metis STATIC)
+target_sources(metis PRIVATE ${METIS_SOURCES})
+target_sources(metis PRIVATE
+  FILE_SET metis_private_headers
+  TYPE HEADERS
+  BASE_DIRS METIS/libmetis
+  FILES
+    METIS/libmetis/defs.h
+    METIS/libmetis/gklib_defs.h
+    METIS/libmetis/gklib_rename.h
+    METIS/libmetis/macros.h
+    METIS/libmetis/metislib.h
+    METIS/libmetis/proto.h
+    METIS/libmetis/rename.h
+    METIS/libmetis/stdheaders.h
+    METIS/libmetis/struct.h
+)
+target_sources(metis PUBLIC
+  FILE_SET metis_public_headers
+  TYPE HEADERS
+  BASE_DIRS METIS/include
+  FILES
+    METIS/include/metis.h
+)
 # Compile metis with 64 bit indices and floating point values
 target_compile_definitions(metis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
 target_link_libraries(metis PUBLIC gklib)
@@ -135,9 +181,29 @@ set(PARMETIS_SOURCES
   libparmetis/xyzpart.c
 )
 
-add_library(parmetis STATIC ${PARMETIS_SOURCES})
-target_include_directories(parmetis PRIVATE libparmetis)
-target_include_directories(parmetis PUBLIC include)
+add_library(parmetis STATIC)
+target_sources(parmetis PRIVATE ${PARMETIS_SOURCES})
+target_sources(parmetis PRIVATE
+  FILE_SET parmetis_private_headers
+  TYPE HEADERS
+  BASE_DIRS libparmetis
+  FILES
+    libparmetis/defs.h
+    libparmetis/gklib_defs.h
+    libparmetis/gklib_rename.h
+    libparmetis/macros.h
+    libparmetis/parmetislib.h
+    libparmetis/proto.h
+    libparmetis/rename.h
+    libparmetis/struct.h
+)
+target_sources(parmetis PUBLIC
+  FILE_SET parmetis_public_headers
+  TYPE HEADERS
+  BASE_DIRS include
+  FILES
+    include/parmetis.h
+)
 # Compile parmetis with 64 bit indices and floating point values
 target_compile_definitions(parmetis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
 target_link_libraries(parmetis PUBLIC gklib metis)
