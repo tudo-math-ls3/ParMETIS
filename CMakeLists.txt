@@ -133,7 +133,7 @@ target_sources(metis PUBLIC
 )
 # Compile metis with 64 bit indices and floating point values
 target_compile_definitions(metis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(metis PUBLIC GKlib)
+target_link_libraries(metis PUBLIC gklib)
 
 #################
 # Build parmetis
@@ -207,7 +207,7 @@ target_sources(parmetis PUBLIC
 )
 # Compile parmetis with 64 bit indices and floating point values
 target_compile_definitions(parmetis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(parmetis PUBLIC GKlib METIS)
+target_link_libraries(parmetis PUBLIC gklib metis)
 
 find_package(MPI REQUIRED)
 target_link_libraries(parmetis PRIVATE MPI::MPI_C)
