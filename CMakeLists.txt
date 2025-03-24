@@ -36,9 +36,9 @@ set(GKLIB_SOURCES
   GKlib/timers.c
   GKlib/tokenizer.c
 )
-add_library(gklib STATIC)
-target_sources(gklib PRIVATE ${GKLIB_SOURCES})
-target_sources(gklib PUBLIC
+add_library(GKlib STATIC)
+target_sources(GKlib PRIVATE ${GKLIB_SOURCES})
+target_sources(GKlib PUBLIC
   FILE_SET gklib_headers
   TYPE HEADERS
   BASE_DIRS GKlib
@@ -107,9 +107,9 @@ set(METIS_SOURCES
   METIS/libmetis/wspace.c
 )
 
-add_library(metis STATIC)
-target_sources(metis PRIVATE ${METIS_SOURCES})
-target_sources(metis PRIVATE
+add_library(METIS STATIC)
+target_sources(METIS PRIVATE ${METIS_SOURCES})
+target_sources(METIS PRIVATE
   FILE_SET metis_private_headers
   TYPE HEADERS
   BASE_DIRS METIS/libmetis
@@ -124,7 +124,7 @@ target_sources(metis PRIVATE
     METIS/libmetis/stdheaders.h
     METIS/libmetis/struct.h
 )
-target_sources(metis PUBLIC
+target_sources(METIS PUBLIC
   FILE_SET metis_public_headers
   TYPE HEADERS
   BASE_DIRS METIS/include
@@ -132,8 +132,8 @@ target_sources(metis PUBLIC
     METIS/include/metis.h
 )
 # Compile metis with 64 bit indices and floating point values
-target_compile_definitions(metis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(metis PUBLIC gklib)
+target_compile_definitions(METIS PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
+target_link_libraries(METIS PUBLIC GKlib)
 
 #################
 # Build parmetis
@@ -207,13 +207,15 @@ target_sources(ParMETIS PUBLIC
 )
 # Compile parmetis with 64 bit indices and floating point values
 target_compile_definitions(ParMETIS PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
-target_link_libraries(ParMETIS PUBLIC gklib metis)
+target_link_libraries(ParMETIS PUBLIC GKlib METIS)
 
 find_package(MPI REQUIRED)
 target_link_libraries(ParMETIS PRIVATE MPI::MPI_C)
 
 # Setup alias for usage with FetchContent
 add_library(ParMETIS::ParMETIS ALIAS ParMETIS)
+add_library(ParMETIS::METIS ALIAS METIS)
+add_library(ParMETIS::GKlib ALIAS GKlib)
 
 ############
 # Packaging
@@ -237,7 +239,7 @@ install(FILES
 
 # Add target to export
 install(
-  TARGETS ParMETIS metis gklib
+  TARGETS ParMETIS METIS GKlib
   EXPORT parmetisTargets
   FILE_SET parmetis_public_headers
   FILE_SET metis_public_headers
