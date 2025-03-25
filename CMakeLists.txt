@@ -36,9 +36,9 @@ set(GKLIB_SOURCES
   GKlib/timers.c
   GKlib/tokenizer.c
 )
-add_library(gklib STATIC)
-target_sources(gklib PRIVATE ${GKLIB_SOURCES})
-target_sources(gklib PUBLIC
+add_library(GKlib STATIC)
+target_sources(GKlib PRIVATE ${GKLIB_SOURCES})
+target_sources(GKlib PUBLIC
   FILE_SET gklib_headers
   TYPE HEADERS
   BASE_DIRS GKlib
@@ -116,9 +116,9 @@ set(METIS_SOURCES
 # values of INDEXTYPEWIDTH and REALTYPEWIDTH into the header.
 configure_file(metis.h.in metis.h @ONLY)
 
-add_library(metis STATIC)
-target_sources(metis PRIVATE ${METIS_SOURCES})
-target_sources(metis PRIVATE
+add_library(METIS STATIC)
+target_sources(METIS PRIVATE ${METIS_SOURCES})
+target_sources(METIS PRIVATE
   FILE_SET metis_private_headers
   TYPE HEADERS
   BASE_DIRS METIS/libmetis
@@ -135,14 +135,14 @@ target_sources(metis PRIVATE
 )
 
 # Add the generated metis.h as the only public header
-target_sources(metis PUBLIC
+target_sources(METIS PUBLIC
   FILE_SET metis_public_headers
   TYPE HEADERS
   BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/metis.h
 )
-target_link_libraries(metis PUBLIC gklib)
+target_link_libraries(METIS PUBLIC GKlib)
 
 #################
 # Build parmetis
@@ -191,9 +191,9 @@ set(PARMETIS_SOURCES
   libparmetis/xyzpart.c
 )
 
-add_library(parmetis STATIC)
-target_sources(parmetis PRIVATE ${PARMETIS_SOURCES})
-target_sources(parmetis PRIVATE
+add_library(ParMETIS STATIC)
+target_sources(ParMETIS PRIVATE ${PARMETIS_SOURCES})
+target_sources(ParMETIS PRIVATE
   FILE_SET parmetis_private_headers
   TYPE HEADERS
   BASE_DIRS libparmetis
@@ -207,7 +207,7 @@ target_sources(parmetis PRIVATE
     libparmetis/rename.h
     libparmetis/struct.h
 )
-target_sources(parmetis PUBLIC
+target_sources(ParMETIS PUBLIC
   FILE_SET parmetis_public_headers
   TYPE HEADERS
   BASE_DIRS include
@@ -215,15 +215,15 @@ target_sources(parmetis PUBLIC
     include/parmetis.h
 )
 # Compile parmetis with 64 bit indices and floating point values
-target_link_libraries(parmetis PUBLIC gklib metis)
+target_link_libraries(ParMETIS PUBLIC GKlib METIS)
 
 find_package(MPI REQUIRED)
-target_link_libraries(parmetis PRIVATE MPI::MPI_C)
+target_link_libraries(ParMETIS PRIVATE MPI::MPI_C)
 
 # Setup alias for usage with FetchContent
-add_library(ParMETIS::ParMETIS ALIAS parmetis)
-add_library(ParMETIS::METIS ALIAS metis)
-add_library(ParMETIS::GKlib ALIAS gklib)
+add_library(ParMETIS::ParMETIS ALIAS ParMETIS)
+add_library(ParMETIS::METIS ALIAS METIS)
+add_library(ParMETIS::GKlib ALIAS GKlib)
 
 ############
 # Packaging
@@ -247,7 +247,7 @@ install(FILES
 
 # Add target to export
 install(
-  TARGETS parmetis metis gklib
+  TARGETS ParMETIS METIS GKlib
   EXPORT parmetisTargets
   FILE_SET parmetis_public_headers
   FILE_SET metis_public_headers
