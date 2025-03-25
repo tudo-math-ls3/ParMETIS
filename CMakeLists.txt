@@ -69,6 +69,9 @@ target_sources(gklib PUBLIC
 # Build METIS
 ##############
 
+set(INDEXTYPEWIDTH 64 CACHE STRING "Bit-width of index types" FORCE)
+set(REALTYPEWIDTH 64 CACHE STRING "Bit-width of floating-point types" FORCE)
+
 set(METIS_SOURCES
   METIS/libmetis/auxapi.c
   METIS/libmetis/balance.c
@@ -107,6 +110,12 @@ set(METIS_SOURCES
   METIS/libmetis/wspace.c
 )
 
+# NOTE(mmuegge): METIS, and by extension ParMETIS, require choosing bit-widths
+# for index and floating-point types. The intended way to do this is to #define
+# these values in the metis.h header. We use configure_file to insert the
+# values of INDEXTYPEWIDTH and REALTYPEWIDTH into the header.
+configure_file(metis.h.in metis.h @ONLY)
+
 add_library(metis STATIC)
 target_sources(metis PRIVATE ${METIS_SOURCES})
 target_sources(metis PRIVATE
@@ -124,15 +133,15 @@ target_sources(metis PRIVATE
     METIS/libmetis/stdheaders.h
     METIS/libmetis/struct.h
 )
+
+# Add the generated metis.h as the only public header
 target_sources(metis PUBLIC
   FILE_SET metis_public_headers
   TYPE HEADERS
-  BASE_DIRS METIS/include
+  BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
   FILES
-    METIS/include/metis.h
+    ${CMAKE_CURRENT_BINARY_DIR}/metis.h
 )
-# Compile metis with 64 bit indices and floating point values
-target_compile_definitions(metis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
 target_link_libraries(metis PUBLIC gklib)
 
 #################
@@ -206,7 +215,6 @@ target_sources(parmetis PUBLIC
     include/parmetis.h
 )
 # Compile parmetis with 64 bit indices and floating point values
-target_compile_definitions(parmetis PUBLIC IDXTYPEWIDTH=64 REALTYPEWIDTH=64)
 target_link_libraries(parmetis PUBLIC gklib metis)
 
 find_package(MPI REQUIRED)
