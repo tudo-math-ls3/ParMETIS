@@ -5,6 +5,8 @@ project(ParMETIS
   DESCRIPTION "Parallel mesh partitioning library"
   LANGUAGES C)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+
 ##############
 # Build GKlib
 ##############
