@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.23)
 
+# Set default for CMAKE_BUILD_TYPE on first configure
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
+  if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+  endif()
+endif()
+
 project(ParMETIS 
   VERSION 4.0.3
   DESCRIPTION "Parallel mesh partitioning library"
