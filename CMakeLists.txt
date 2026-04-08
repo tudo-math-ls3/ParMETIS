@@ -54,10 +54,6 @@ set(GKLIB_SOURCES
   GKlib/src/tokenizer.c
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  list(APPEND GKLIB_SOURCES GKlib/src/win32/adapt.c)
-endif()
-
 add_library(gklib STATIC)
 target_sources(gklib PRIVATE ${GKLIB_SOURCES})
 target_sources(gklib PUBLIC
@@ -86,10 +82,6 @@ target_sources(gklib PUBLIC
     GKlib/include/gk_struct.h
     GKlib/include/gk_types.h
 )
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  target_sources(gklib PUBLIC FILE_SET gklib_headers TYPE HEADERS BASE_DIRS GKlib/include FILES GKlib/include/win32/adapt.h)
-endif()
 
 target_compile_definitions(gklib PUBLIC IDXTYPEWIDTH=${INDEXTYPEWIDTH})
 target_compile_definitions(gklib PUBLIC REALTYPEWIDTH=${REALTYPEWIDTH})
